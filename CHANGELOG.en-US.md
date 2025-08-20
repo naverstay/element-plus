@@ -116,7 +116,7 @@ _2025-08-01_
 - Style(components): [input] prevent slot element width squeeze (#21476 by @keeplearning66)
 - Style(components): remove unused icon class & autocomplete tweaks (#21565 by @Dsaquel)
 
-### 2.10.4
+### 2.10.7
 
 _2025-07-11_
 
