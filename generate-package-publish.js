@@ -36,4 +36,10 @@ if (!fs.existsSync(path.dirname(outputPath))) {
 
 fs.writeFileSync(outputPath, JSON.stringify(publishPkg, null, 2))
 
-console.log(`package.json for publishing was created in ${outputPath}`)
+console.log(
+  `package.json for publishing was created in ${outputPath}\n\n${JSON.stringify(
+    publishPkg,
+    null,
+    2
+  )}`
+)

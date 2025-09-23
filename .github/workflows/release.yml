@@ -33,20 +33,17 @@ jobs:
         run: |
           node generate-package-publish.js
 
-      # 5. Pack dist into tgz
-      - name: Pack dist
+      # 5. Create tgz with only dist using git archive
+      - name: Create dist-only tgz
         run: |
-          cd dist
-          npm pack
-          ARCHIVE=$(ls *.tgz)
-          echo "ARCHIVE=$ARCHIVE" >> $GITHUB_ENV
+          # Создаём временную ветку с dist
+          git checkout -b release-temp
+          git add dist/package.json dist/**/*.js dist/**/*.css
+          git commit -m "Prepare dist for release" || echo "Nothing to commit"
+          git archive --format=tar.gz --prefix=naverstay-element-plus/ -o dist/naverstay-element-plus-latest.tgz HEAD dist
+          echo "TGZ created at dist/naverstay-element-plus-latest.tgz"
 
-      # 6. Copy archive as latest
-      - name: Copy archive as latest
-        run: |
-          cp dist/$ARCHIVE dist/naverstay-element-plus-latest.tgz
-
-      # 7. Create or update tag for release
+      # 6. Create or update tag main-latest
       - name: Create or update tag main-latest
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -55,7 +52,7 @@ jobs:
           git push origin main-latest --force
           echo "TAG_NAME=main-latest" >> $GITHUB_ENV
 
-      # 8. Publish latest release to GitHub
+      # 7. Publish latest release to GitHub
       - name: Publish latest release
         uses: softprops/action-gh-release@v1
         with:
