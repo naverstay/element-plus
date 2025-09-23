@@ -1,4 +1,4 @@
-name: Build & Release element-plus fork
+name: Build & Release element-plus latest
 
 on:
   push:
@@ -24,7 +24,7 @@ jobs:
           npm install -g pnpm@9.5.0
           pnpm install
 
-      # 3. Сборка проекта
+      # 3. Build project
       - name: Build project
         run: pnpm build
 
@@ -33,7 +33,7 @@ jobs:
         run: |
           node generate-package-publish.js
 
-      # 5. Пакуем dist в tgz
+      # 5. Pack dist into tgz
       - name: Pack dist
         run: |
           cd dist
@@ -41,16 +41,16 @@ jobs:
           ARCHIVE=$(ls *.tgz)
           echo "ARCHIVE=$ARCHIVE" >> $GITHUB_ENV
 
-      # 6. Копируем архив для latest
+      # 6. Copy archive as latest
       - name: Copy archive as latest
         run: |
           cp dist/$ARCHIVE dist/naverstay-element-plus-latest.tgz
 
-      # 7. Загружаем артефакты workflow (версионный и latest)
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+      # 7. Publish release to GitHub
+      - name: Publish latest release
+        uses: softprops/action-gh-release@v1
         with:
-          name: element-plus-build
-          path: |
-            dist/$ARCHIVE
-            dist/naverstay-element-plus-latest.tgz
+          files: dist/naverstay-element-plus-latest.tgz
+          name: naverstay-element-plus-latest.tgz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
