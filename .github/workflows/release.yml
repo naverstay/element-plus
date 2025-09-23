@@ -10,29 +10,49 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Клонируем репо
       - uses: actions/checkout@v4
 
+      # 2. Настройка Node.js и pnpm
       - uses: actions/setup-node@v4
         with:
           node-version: 18
 
-      - name: Install deps
+      - name: Install dependencies
         run: |
           npm install -g pnpm
           pnpm install
 
+      # 3. Сборка проекта
       - name: Build project
         run: pnpm build
 
-      - name: Prepare publish package.json
-        run: cp package.publish.json dist/package.json
+      # 4. Обновляем package.publish.json под версию тега
+      - name: Update package.publish.json version
+        run: |
+          TAG_VERSION=${GITHUB_REF#refs/tags/v}
+          echo "Setting package version to $TAG_VERSION"
+          jq --arg ver "$TAG_VERSION" '.version=$ver' package.publish.json > dist/package.json
 
+      # 5. Пакуем dist в .tgz
       - name: Pack dist
-        run: cd dist && npm pack
+        run: |
+          cd dist
+          npm pack
 
-      - name: Upload to release
+      # 6. Загружаем в релиз GitHub
+      - name: Upload versioned tgz
         uses: softprops/action-gh-release@v1
         with:
           files: dist/*.tgz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # 7. Загружаем копию для latest
+      - name: Upload latest tgz
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/*.tgz
+          name: naverstay-element-plus-latest.tgz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
