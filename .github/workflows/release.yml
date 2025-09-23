@@ -1,0 +1,38 @@
+name: Build & Release element-plus fork
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install deps
+        run: |
+          npm install -g pnpm
+          pnpm install
+
+      - name: Build project
+        run: pnpm build
+
+      - name: Prepare publish package.json
+        run: cp package.publish.json dist/package.json
+
+      - name: Pack dist
+        run: cd dist && npm pack
+
+      - name: Upload to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/*.tgz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
