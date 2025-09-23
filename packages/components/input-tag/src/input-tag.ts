@@ -3,6 +3,7 @@ import {
   definePropType,
   iconPropType,
   isArray,
+  isNumber,
   isString,
   isUndefined,
 } from '@element-plus/utils'
@@ -126,7 +127,7 @@ export const inputTagProps = buildProps({
    * @description native input autocomplete
    */
   autocomplete: {
-    type: String,
+    type: definePropType<HTMLInputElement['autocomplete']>(String),
     default: 'off',
   },
   /**
@@ -135,6 +136,21 @@ export const inputTagProps = buildProps({
   saveOnBlur: {
     type: Boolean,
     default: true,
+  },
+  /**
+   * @description whether to collapse tags to a text
+   */
+  collapseTags: Boolean,
+  /**
+   * @description whether show all selected tags when mouse hover text of collapse-tags. To use this, `collapse-tags` must be true
+   */
+  collapseTagsTooltip: Boolean,
+  /**
+   * @description the max tags number to be shown. To use this, `collapse-tags` must be true
+   */
+  maxCollapseTags: {
+    type: Number,
+    default: 1,
   },
   /**
    * @description native `aria-label` attribute
@@ -150,7 +166,10 @@ export const inputTagEmits = {
   [CHANGE_EVENT]: (value?: string[]) => isArray(value) || isUndefined(value),
   [INPUT_EVENT]: (value: string) => isString(value),
   'add-tag': (value: string | string[]) => isString(value) || isArray(value),
-  'remove-tag': (value: string) => isString(value),
+  'remove-tag': (value: string, index: number) =>
+    isString(value) && isNumber(index),
+  'drag-tag': (oldIndex: number, newIndex: number, value: string) =>
+    isNumber(oldIndex) && isNumber(newIndex) && isString(value),
   focus: (evt: FocusEvent) => evt instanceof FocusEvent,
   blur: (evt: FocusEvent) => evt instanceof FocusEvent,
   clear: () => true,

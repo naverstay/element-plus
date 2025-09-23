@@ -5,6 +5,7 @@ import {
   useEmptyValuesProps,
   useSizeProp,
 } from '@element-plus/hooks'
+import { useTooltipContentProps } from '@element-plus/components/tooltip'
 import { CircleClose } from '@element-plus/icons-vue'
 import { disabledTimeListsProps } from '../props/shared'
 import { dateTimeStartEndUnits } from '../constants'
@@ -35,6 +36,13 @@ export type GetDisabledSeconds = (
 
 export const timePickerDefaultProps = buildProps({
   /**
+   * @description this prop decides if the date picker panel pops up when the input is focused
+   */
+  automaticDropdown: {
+    type: Boolean,
+    default: true,
+  },
+  /**
    * @description same as `id` in native input
    */
   id: {
@@ -49,10 +57,11 @@ export const timePickerDefaultProps = buildProps({
   /**
    * @description custom class name for TimePicker's dropdown
    */
-  popperClass: {
-    type: String,
-    default: '',
-  },
+  popperClass: useTooltipContentProps.popperClass,
+  /**
+   * @description custom style for TimePicker's dropdown
+   */
+  popperStyle: useTooltipContentProps.popperStyle,
   /**
    * @description format of the displayed value in the input box
    */
@@ -62,11 +71,11 @@ export const timePickerDefaultProps = buildProps({
    */
   valueFormat: String,
   /**
-   * @description optional, format of the date displayed value in TimePicker's dropdown
+   * @description optional, format of the date displayed in input's inner panel
    */
   dateFormat: String,
   /**
-   * @description optional, format of the time displayed value in TimePicker's dropdown
+   * @description optional, format of the time displayed in input's inner panel
    */
   timeFormat: String,
   /**
@@ -231,6 +240,13 @@ export const timePickerDefaultProps = buildProps({
    * @description whether to show the now button
    */
   showNow: {
+    type: Boolean,
+    default: true,
+  },
+  /**
+   * @description whether to show footer
+   */
+  showConfirm: {
     type: Boolean,
     default: true,
   },

@@ -1,13 +1,14 @@
 import { isEqual } from 'lodash-unified'
-import { type Nullable, isPropAbsent } from '@element-plus/utils'
+import { isPropAbsent } from '@element-plus/utils'
 import Node from './node'
 
+import type { Nullable } from '@element-plus/utils'
 import type {
   CascaderConfig,
   CascaderNodePathValue,
   CascaderNodeValue,
   CascaderOption,
-} from './node'
+} from './types'
 
 const flatNodes = (nodes: Node[], leafOnly: boolean) => {
   return nodes.reduce((res, node) => {

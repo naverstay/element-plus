@@ -5,19 +5,19 @@ import {
   useEmptyValuesProps,
   useSizeProp,
 } from '@element-plus/hooks'
-import {
-  EmitFn,
-  buildProps,
-  definePropType,
-  iconPropType,
-} from '@element-plus/utils'
+import { buildProps, definePropType, iconPropType } from '@element-plus/utils'
 import { useTooltipContentProps } from '@element-plus/components/tooltip'
 import { ArrowDown, CircleClose } from '@element-plus/icons-vue'
 import { tagProps } from '@element-plus/components/tag'
 import { CHANGE_EVENT, UPDATE_MODEL_EVENT } from '@element-plus/constants'
 import { defaultProps } from '@element-plus/components/select-v2/src/useProps'
 
-import type { ExtractPropTypes, __ExtractPublicPropTypes } from 'vue'
+import type { EmitFn } from '@element-plus/utils'
+import type {
+  CSSProperties,
+  ExtractPropTypes,
+  __ExtractPublicPropTypes,
+} from 'vue'
 import type Select from './select.vue'
 import type {
   Options,
@@ -97,6 +97,12 @@ export const selectProps = buildProps({
   popperClass: {
     type: String,
     default: '',
+  },
+  /**
+   * @description custom style for Select's dropdown
+   */
+  popperStyle: {
+    type: definePropType<string | CSSProperties>([String, Object]),
   },
   /**
    * @description [popper.js](https://popper.js.org/docs/v2/) parameters
