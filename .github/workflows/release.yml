@@ -52,7 +52,7 @@ jobs:
 
       # 7. Загружаем артефакты workflow (версионный и latest)
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: element-plus-build
           path: |
