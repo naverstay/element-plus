@@ -29,7 +29,7 @@ jobs:
         run: pnpm build
 
       # 4. Generate minimal package.json in dist
-      - name: Generate minimal package.publish.json
+      - name: Generate minimal package.json
         run: |
           node generate-package-publish.js
 

@@ -1,10 +1,8 @@
 const fs = require('fs')
 const path = require('path')
 
-const inputPath = path.resolve(__dirname, 'package.json')
-const outputPath = path.resolve(__dirname, 'dist', 'package.json')
-
-const pkg = JSON.parse(fs.readFileSync(inputPath, 'utf-8'))
+const pkgPath = path.resolve(__dirname, 'package.json')
+const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'))
 
 const allowedFields = [
   'name',
@@ -24,22 +22,28 @@ const allowedFields = [
 ]
 
 const publishPkg = {}
+
 for (const key of allowedFields) {
   if (pkg[key] !== undefined) {
     publishPkg[key] = pkg[key]
   }
 }
 
-if (!fs.existsSync(path.dirname(outputPath))) {
-  fs.mkdirSync(path.dirname(outputPath), { recursive: true })
+if (publishPkg.dependencies) {
+  for (const dep in publishPkg.dependencies) {
+    if (publishPkg.dependencies[dep].startsWith('workspace:')) {
+      delete publishPkg.dependencies[dep]
+    }
+  }
 }
 
-fs.writeFileSync(outputPath, JSON.stringify(publishPkg, null, 2))
+const distPath = path.resolve(__dirname, 'dist')
+if (!fs.existsSync(distPath)) {
+  fs.mkdirSync(distPath, { recursive: true })
+}
 
-console.log(
-  `package.json for publishing was created in ${outputPath}\n\n${JSON.stringify(
-    publishPkg,
-    null,
-    2
-  )}`
-)
+const outPath = path.join(distPath, 'package.json')
+const json = JSON.stringify(publishPkg, null, 2)
+fs.writeFileSync(outPath, json)
+
+console.log(`package.json for publishing was created in ${outPath}\n\n${json}`)
