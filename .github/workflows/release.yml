@@ -1,4 +1,4 @@
-name: Build & Release element-plus fork
+name: Upload element-plus tgz to GitHub Release
 
 on:
   push:
@@ -7,53 +7,43 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Клонируем репо
+      # 1. Checkout репозитория
       - uses: actions/checkout@v4
 
-      # 2. Настройка Node.js и pnpm
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - name: Install dependencies
+      # 2. Определяем версию из тега
+      - name: Determine version
+        id: version
         run: |
-          npm install -g pnpm
-          pnpm install
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            VERSION=${GITHUB_REF#refs/tags/v}
+          else
+            VERSION="0.0.0-dev"
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Determined version: $VERSION"
 
-      # 3. Сборка проекта
-      - name: Build project
-        run: pnpm build
-
-      # 4. Обновляем package.publish.json под версию тега
-      - name: Update package.publish.json version
-        run: |
-          TAG_VERSION=${GITHUB_REF#refs/tags/v}
-          echo "Setting package version to $TAG_VERSION"
-          jq --arg ver "$TAG_VERSION" '.version=$ver' package.publish.json > dist/package.json
-
-      # 5. Пакуем dist в .tgz
-      - name: Pack dist
-        run: |
-          cd dist
-          npm pack
-
-      # 6. Загружаем в релиз GitHub
+      # 3. Загружаем готовый tgz из папки release-artifacts (или dist)
+      #    Например, предположим, что tgz лежит в dist/
       - name: Upload versioned tgz
         uses: softprops/action-gh-release@v1
         with:
-          files: dist/*.tgz
+          files: dist/naverstay-element-plus-$VERSION.tgz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 7. Загружаем копию для latest
+      # 4. Создаём копию для latest
       - name: Upload latest tgz
+        run: |
+          cp dist/naverstay-element-plus-$VERSION.tgz dist/naverstay-element-plus-latest.tgz
+        # Загружаем latest
+      - name: Upload latest tgz to release
         uses: softprops/action-gh-release@v1
         with:
-          files: dist/*.tgz
+          files: dist/naverstay-element-plus-latest.tgz
           name: naverstay-element-plus-latest.tgz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
