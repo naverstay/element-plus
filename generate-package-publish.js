@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 
 const inputPath = path.resolve(__dirname, 'package.json')
-const outputPath = path.resolve(__dirname, 'dist', 'package.publish.json')
+const outputPath = path.resolve(__dirname, 'dist', 'package.json')
 
 const pkg = JSON.parse(fs.readFileSync(inputPath, 'utf-8'))
 
@@ -36,4 +36,4 @@ if (!fs.existsSync(path.dirname(outputPath))) {
 
 fs.writeFileSync(outputPath, JSON.stringify(publishPkg, null, 2))
 
-console.log(`package.publish.json created in ${outputPath}`)
+console.log(`package.json for publishing was created in ${outputPath}`)
