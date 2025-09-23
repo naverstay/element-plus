@@ -50,19 +50,11 @@ jobs:
         run: |
           cp dist/$ARCHIVE dist/naverstay-element-plus-latest.tgz
 
-      # 7. Загружаем версионный архив
-      - name: Upload versioned tgz
-        uses: softprops/action-gh-release@v1
+      # 7. Загружаем артефакты workflow (версионный и latest)
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
         with:
-          files: dist/*.tgz
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # 8. Загружаем latest
-      - name: Upload latest tgz
-        uses: softprops/action-gh-release@v1
-        with:
-          files: dist/naverstay-element-plus-latest.tgz
-          name: naverstay-element-plus-latest.tgz
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: element-plus-build
+          path: |
+            dist/$ARCHIVE
+            dist/naverstay-element-plus-latest.tgz
