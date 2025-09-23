@@ -33,14 +33,11 @@ jobs:
         run: |
           node generate-package-publish.js
 
-      # 5. Create tgz with only dist using git archive
+      # 5. Create tgz with only dist contents
       - name: Create dist-only tgz
         run: |
-          # Создаём временную ветку с dist
-          git checkout -b release-temp
-          git add dist/package.json dist/**/*.js dist/**/*.css
-          git commit -m "Prepare dist for release" || echo "Nothing to commit"
-          git archive --format=tar.gz --prefix=naverstay-element-plus/ -o dist/naverstay-element-plus-latest.tgz HEAD dist
+          cd dist
+          tar -czf naverstay-element-plus-latest.tgz *
           echo "TGZ created at dist/naverstay-element-plus-latest.tgz"
 
       # 6. Create or update tag main-latest
