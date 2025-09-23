@@ -1,5 +1,5 @@
 {
-  "version": "2.10.7",
+  "version": "2.11.3",
   "private": true,
   "packageManager": "pnpm@9.5.0",
   "workspaces": [

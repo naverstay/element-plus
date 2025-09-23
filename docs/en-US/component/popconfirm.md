@@ -86,5 +86,5 @@ popconfirm/trigger-event
 
 | Name                | Description                  | Type                                        |
 | ------------------- | ---------------------------- | ------------------------------------------- |
-| popperRef ^(2.10.7) | el-popper component instance | ^[object]`Ref<PopperInstance \| undefined>` |
-| hide ^(2.10.7)      | hide popconfirm              | ^[Function]`() => void`                     |
+| popperRef ^(2.11.3) | el-popper component instance | ^[object]`Ref<PopperInstance \| undefined>` |
+| hide ^(2.11.3)      | hide popconfirm              | ^[Function]`() => void`                     |

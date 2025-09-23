@@ -150,7 +150,7 @@ _2025-08-22_
 - Components export `TreeV2Instance` & optimize type usage (#21718 by @zhixiaotong)
 - Components [cascader-panel] unify click node (#21796 by @Dsaquel)
 
-### 2.10.7
+### 2.11.3
 
 _2025-08-12_
 
@@ -265,7 +265,7 @@ _2025-08-01_
 - Style(components): [input] prevent slot element width squeeze (#21476 by @keeplearning66)
 - Style(components): remove unused icon class & autocomplete tweaks (#21565 by @Dsaquel)
 
-### 2.10.7
+### 2.11.3
 
 _2025-07-11_
 
