@@ -28,14 +28,10 @@ jobs:
       - name: Build project
         run: pnpm build
 
-      # 4. Определяем версию из package.json и создаём package.json в dist
-      - name: Determine package version
-        id: version
+      # 4. Генерация package.publish.json
+      - name: Generate minimal package.publish.json
         run: |
-          VERSION=$(jq -r .version package.json)
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "Using package version: $VERSION"
-          jq --arg ver "$VERSION" '.version=$ver' package.publish.json > dist/package.json
+          node generate-package-publish.js
 
       # 5. Пакуем dist в tgz
       - name: Pack dist
