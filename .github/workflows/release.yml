@@ -1,4 +1,4 @@
-name: Upload element-plus tgz to GitHub Release
+name: Build & Release element-plus fork
 
 on:
   push:
@@ -7,15 +7,29 @@ on:
   workflow_dispatch:
 
 jobs:
-  release:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout репозитория
+      # 1. Checkout
       - uses: actions/checkout@v4
 
-      # 2. Определяем версию из тега
-      - name: Determine version
+      # 2. Node.js + pnpm
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: |
+          npm install -g pnpm gh
+          pnpm install
+
+      # 3. Сборка проекта
+      - name: Build project
+        run: pnpm build
+
+      # 4. Определяем версию и создаём package.json в dist
+      - name: Determine package version
         id: version
         run: |
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
@@ -24,23 +38,60 @@ jobs:
             VERSION="0.0.0-dev"
           fi
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "Determined version: $VERSION"
+          echo "Using package version: $VERSION"
+          jq --arg ver "$VERSION" '.version=$ver' package.publish.json > dist/package.json
 
-      # 3. Загружаем готовый tgz из папки release-artifacts (или dist)
-      #    Например, предположим, что tgz лежит в dist/
+      # 5. Пакуем dist в tgz
+      - name: Pack dist
+        run: |
+          cd dist
+          npm pack
+          ARCHIVE=$(ls *.tgz)
+          echo "ARCHIVE=$ARCHIVE" >> $GITHUB_ENV
+
+      # 6. Копируем архив для latest
+      - name: Copy archive as latest
+        run: |
+          cp dist/$ARCHIVE dist/naverstay-element-plus-latest.tgz
+
+      # 7. Создаём релиз, если его ещё нет
+      - name: Create release if not exists
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG_NAME="v$VERSION"
+          RELEASE_EXISTS=$(gh release view $TAG_NAME --repo $GITHUB_REPOSITORY --json id 2>/dev/null || echo "")
+          if [ -z "$RELEASE_EXISTS" ]; then
+            gh release create $TAG_NAME --title "Release $TAG_NAME" --notes "Auto release $TAG_NAME" --repo $GITHUB_REPOSITORY
+            echo "Release $TAG_NAME created"
+          else
+            echo "Release $TAG_NAME already exists"
+          fi
+
+      # 8. Удаляем старый latest
+      - name: Delete old latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG_NAME="v$VERSION"
+          ASSET_ID=$(gh release view $TAG_NAME --repo $GITHUB_REPOSITORY --json assets --jq '.assets[] | select(.name=="naverstay-element-plus-latest.tgz") | .id' 2>/dev/null)
+          if [ -n "$ASSET_ID" ]; then
+            gh release delete-asset $ASSET_ID --repo $GITHUB_REPOSITORY
+            echo "Old latest deleted"
+          else
+            echo "No old latest found"
+          fi
+
+      # 9. Загружаем версионный архив
       - name: Upload versioned tgz
         uses: softprops/action-gh-release@v1
         with:
-          files: dist/naverstay-element-plus-$VERSION.tgz
+          files: dist/*.tgz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 4. Создаём копию для latest
+      # 10. Загружаем latest
       - name: Upload latest tgz
-        run: |
-          cp dist/naverstay-element-plus-$VERSION.tgz dist/naverstay-element-plus-latest.tgz
-        # Загружаем latest
-      - name: Upload latest tgz to release
         uses: softprops/action-gh-release@v1
         with:
           files: dist/naverstay-element-plus-latest.tgz
