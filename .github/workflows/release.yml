@@ -28,7 +28,7 @@ jobs:
       - name: Build project
         run: pnpm build
 
-      # 4. Генерация package.publish.json
+      # 4. Generate minimal package.json in dist
       - name: Generate minimal package.publish.json
         run: |
           node generate-package-publish.js
@@ -46,11 +46,21 @@ jobs:
         run: |
           cp dist/$ARCHIVE dist/naverstay-element-plus-latest.tgz
 
-      # 7. Publish release to GitHub
+      # 7. Create or update tag for release
+      - name: Create or update tag main-latest
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git tag -f main-latest
+          git push origin main-latest --force
+          echo "TAG_NAME=main-latest" >> $GITHUB_ENV
+
+      # 8. Publish latest release to GitHub
       - name: Publish latest release
         uses: softprops/action-gh-release@v1
         with:
           files: dist/naverstay-element-plus-latest.tgz
           name: naverstay-element-plus-latest.tgz
+          tag_name: ${{ env.TAG_NAME }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
